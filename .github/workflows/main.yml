@@ -1,0 +1,38 @@
+name: Build Currency
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Скачать исходники
+        uses: actions/checkout@v4
+
+      - name: Установить Java 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+
+      - name: Проверить файлы проекта
+        run: |
+          pwd
+          ls -la
+          find . -maxdepth 4 -type f | sort
+
+      - name: Сделать Gradle запускаемым
+        run: chmod +x gradlew
+
+      - name: Собрать мод
+        run: ./gradlew build --no-daemon --stacktrace
+
+      - name: Сохранить JAR
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Currency-1.12.2
+          path: build/libs/*.jar
